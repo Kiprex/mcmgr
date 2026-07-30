@@ -11,49 +11,38 @@ import (
 	"net/url"
 	//"os"
 	"strings"
-
+	mr "github.com/kiprex/mcmgr/internal/modrinth"
 	"github.com/spf13/cobra"
 )
 
-type Response struct {
-	Hits []Project `json:"hits"`
-}
-type Project struct {
-	ProjectID   string   `json:"project_id"`
-	Slug        string   `json:"slug"`
-	Title       string   `json:"title"`
-	Description string   `json:"description"`
-	Author      string   `json:"author"`
-	Versions    []string `json:"versions"`
-	Categories  []string `json:"categories"`
-}
 
-func PrintProjectList(projectList []Project) {
-	fmt.Println("Found " + fmt.Sprint(len(projectList)) + " projects")
-	for i := 0; i < len(projectList); i++ {
-		project := projectList[i]
-		fmt.Println(fmt.Sprint(i+1) + ". " + string(project.Title))
-		fmt.Println(" Author: " + string(project.Author))
+
+func PrintSearchHitList(SearchHitList []mr.SearchHit) {
+	fmt.Println("Found " + fmt.Sprint(len(SearchHitList)) + " SearchHits")
+	for i := 0; i < len(SearchHitList); i++ {
+		SearchHit := SearchHitList[i]
+		fmt.Println(fmt.Sprint(i+1) + ". " + string(SearchHit.Title))
+		fmt.Println(" Author: " + string(SearchHit.Author))
 		fmt.Println()
 	}
 }
 
-func searchMods(query string) (Response, error) {
+func searchMods(query string) (mr.SearchResponse, error) {
 	v := url.Values{}
 	v.Set("query", query)
 	resp, err := http.Get("https://api.modrinth.com/v2/search?" + v.Encode())
 	if err != nil {
-		return Response{}, err
+		return mr.SearchResponse{}, err
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return Response{}, err
+		return mr.SearchResponse{}, err
 	}
-	var result Response
+	var result mr.SearchResponse
 	err = json.Unmarshal(body, &result)
 	if err != nil {
-		return Response{}, err
+		return mr.SearchResponse{}, err
 	}
 	return result, nil
 }
@@ -78,7 +67,7 @@ to quickly create a Cobra application.`,
 			fmt.Println("Список пуст, показывать нечего")
 			return
 		}
-		PrintProjectList(result.Hits)
+		PrintSearchHitList(result.Hits)
 	},
 }
 
