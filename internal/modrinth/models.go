@@ -1,8 +1,5 @@
 package modrinth
 
-
-
-
 type SearchResponse struct {
 	Hits []SearchHit `json:"hits"`
 }
