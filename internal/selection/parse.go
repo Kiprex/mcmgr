@@ -9,6 +9,7 @@ import(
 
 
 
+
 func Parse(input string, max int) ([]int, error){
 
 	formattedInput := strings.TrimSpace(input)
@@ -30,6 +31,8 @@ func Parse(input string, max int) ([]int, error){
 		}
 		if singleResult > max{
 			return nil, errors.New("selection: given number is bigger than items list length")
+		} else if singleResult <= 0{
+			return nil, errors.New("selection: given number is smaller than one and cannot be sequence number")
 		}
 		return []int{singleResult - 1}, nil
 	}
