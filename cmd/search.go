@@ -5,22 +5,19 @@ package cmd
 
 import (
 	"fmt"
-	"strings"
 	mr "github.com/kiprex/mcmgr/internal/modrinth"
 	"github.com/spf13/cobra"
+	"strings"
 )
-
-
 
 func printSearchHitList(searchHitList []mr.SearchHit) {
 	fmt.Println("Found " + fmt.Sprint(len(searchHitList)) + " SearchHits")
-	for i, searchHit :=  range searchHitList {
+	for i, searchHit := range searchHitList {
 		fmt.Println(fmt.Sprint(i+1) + ". " + searchHit.Title)
 		fmt.Println(" Author: " + searchHit.Author)
 		fmt.Println()
 	}
 }
-
 
 // searchCmd represents the search command
 var searchCmd = &cobra.Command{

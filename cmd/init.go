@@ -1,14 +1,13 @@
 /*
 Copyright © 2026 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
 import (
 	"fmt"
-	"strings"
-	"github.com/spf13/cobra"
 	"github.com/kiprex/mcmgr/internal/project"
+	"github.com/spf13/cobra"
+	"strings"
 )
 
 // initCmd represents the init command

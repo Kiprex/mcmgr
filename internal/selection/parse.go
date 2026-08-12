@@ -1,30 +1,25 @@
 package selection
 
-
-import(
-	"strings"
+import (
 	"errors"
 	"strconv"
+	"strings"
 )
 
-
-func parseSingle(input string, max int) (int, error){
+func parseSingle(input string, max int) (int, error) {
 	singleResult, err := strconv.Atoi(input)
-	if err != nil{
+	if err != nil {
 		return -1, err
 	}
-	if singleResult > max{
+	if singleResult > max {
 		return -1, errors.New("selection: given number is bigger than items list length")
-	} else if singleResult <= 0{
+	} else if singleResult <= 0 {
 		return -1, errors.New("selection: given number is smaller than one and cannot be sequence number")
 	}
 	return singleResult - 1, nil
 }
 
-
-
-
-func Parse(input string, max int) ([]int, error){
+func Parse(input string, max int) ([]int, error) {
 
 	formattedInput := strings.TrimSpace(input)
 	if formattedInput == "" {
@@ -37,15 +32,8 @@ func Parse(input string, max int) ([]int, error){
 			selected = append(selected, i)
 		}
 		return selected, nil
-	} 
-	if len(formattedInput) == 1 {
-		result, err := parseSingle(formattedInput, max)
-		if err != nil{
-			return nil, err
-		}
-		return []int{result}, nil
 	}
-	if strings.Contains(formattedInput, ","){
+	if strings.Contains(formattedInput, ",") {
 		caseList := strings.Split(formattedInput, ",")
 
 		result := make([]int, 0, len(caseList))
@@ -53,12 +41,12 @@ func Parse(input string, max int) ([]int, error){
 		// map результатов: ключ - элемент
 		unsortedResult := make(map[int]bool)
 
-		for _, item := range caseList{
+		for _, item := range caseList {
 			formattedItem, err := parseSingle(strings.TrimSpace(item), max)
-			if err != nil{
+			if err != nil {
 				return nil, err
 			}
-			if !unsortedResult[formattedItem]{
+			if !unsortedResult[formattedItem] {
 				unsortedResult[formattedItem] = true
 				result = append(result, formattedItem)
 			}
@@ -66,6 +54,9 @@ func Parse(input string, max int) ([]int, error){
 
 		return result, nil
 	}
-
-	return nil, errors.New("selection: not implemented")
+	result, err := parseSingle(formattedInput, max)
+	if err != nil {
+		return nil, err
+	}
+	return []int{result}, nil
 }

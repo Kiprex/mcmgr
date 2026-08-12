@@ -1,12 +1,11 @@
 package modrinth
 
 import (
-	"net/url"
-	"net/http"
 	"encoding/json"
 	"io"
+	"net/http"
+	"net/url"
 )
-
 
 func Search(query string) (SearchResponse, error) {
 	v := url.Values{}
