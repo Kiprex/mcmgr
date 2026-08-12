@@ -68,8 +68,33 @@ func TestParseSingleNumsReturnsOneResult(t *testing.T) {
 			if !tt.WantErr && !slices.Equal(result, tt.Want){
 				t.Errorf("Parse(%q, %d) = %v, want %v", tt.Input, tt.Max, result, tt.Want)
 			}
-		})
+		})		
+	}
+}
+func TestParseMultipleSingleNums(t *testing.T){
+	tests := []testCase{
+		{"1,2 returns [0,1]", "1, 2", 3, []int{0, 1}, false},
+		{"1,3 returns [0,2]", "1, 3", 3, []int{0, 2}, false},
+		{"1,2,3 returns [0,1,2]", "1, 2, 3", 3, []int{0, 1, 2}, false},
+		{"1,1 returns [0]", "1, 1", 3, []int{0}, false},
+		{"1,2,1 returns [0,1]", "1, 2, 1", 3, []int{0, 1}, false},
+	}
+	for _, tt  := range tests{
+		t.Run(tt.Name, func(t *testing.T){
+			// запускаем функцию
+    		result, err := Parse(tt.Input, tt.Max)
 
-		
+			// проверка работоспособности самой функции
+			if err != nil && !tt.WantErr{
+				t.Fatalf("Parse(%q, %d): unexpected error: %v", tt.Input, tt.Max, err)
+			}
+			if tt.WantErr && err == nil{
+				t.Fatalf("Parse(%q, %d): expected error, got result: %v", tt.Input, tt.Max, result)
+			}
+			// проверка соотвествия результата ожиданиям
+			if !tt.WantErr && !slices.Equal(result, tt.Want){
+				t.Errorf("Parse(%q, %d) = %v, want %v", tt.Input, tt.Max, result, tt.Want)
+			}
+		})
 	}
 }
