@@ -6,6 +6,15 @@ import (
 	"strings"
 )
 
+// parseSingle читает строку и пытается привести ее к числу, входящему в диапазон от нуля до max.
+//
+// Параметры:
+//   - input: строка для обработки
+//   - max: максимальное значение диапазона
+//
+// Возвращает:
+//   - получившиеся число
+//   - ошибку при неудавшемся парсинге
 func parseSingle(input string, max int) (int, error) {
 	singleResult, err := strconv.Atoi(input)
 	if err != nil {
@@ -19,10 +28,78 @@ func parseSingle(input string, max int) (int, error) {
 	return singleResult - 1, nil
 }
 
-func Parse(input string, max int) ([]int, error) {
+// parseRange читает строку и пытается привести ее диапазону чисел, входящему в диапазон от нуля до max.
+//
+// Параметры:
+//   - input: строка для обработки
+//   - max: максимальное значение диапазона
+//
+// Возвращает:
+//   - получившийся срез чисел
+//   - ошибку при неудавшемся парсинге
+func parseRange(input string, max int) ([]int, error) {
+	if strings.Count(input, "-") > 1 {
+		return nil, errors.New("Invalid input")
+	}
+	caseList := strings.Split(input, "-")
+	left, err := parseSingle(caseList[0], max)
 
+	if err != nil {
+		return nil, err
+	}
+
+	right, err := parseSingle(caseList[len(caseList)-1], max)
+	if err != nil {
+		return nil, err
+	}
+	if left > right {
+		return nil, errors.New("Invalid range edges")
+	}
+	result := make([]int, right-left+1)
+	for i := range result {
+		result[i] = left + i
+	}
+	return result, nil
+}
+
+func removeDuplicates(inputRange []int) []int {
+	result := make([]int, 0, len(inputRange))
+
+	// map результатов: ключ - элемент
+	unsortedResult := make(map[int]bool)
+
+	for _, item := range inputRange {
+		if !unsortedResult[item] {
+			unsortedResult[item] = true
+			result = append(result, item)
+		}
+	}
+	return result
+}
+
+func Parse(input string, max int) ([]int, error) {
 	formattedInput := strings.TrimSpace(input)
-	if formattedInput == "" {
+
+	switch {
+	case strings.Contains(formattedInput, ","): //  если сложное выражение
+		caseList := strings.Split(formattedInput, ",")
+		preResult := []int{}
+		for _, item := range caseList {
+			preRange, err := Parse(item, max)
+			if err != nil {
+				return nil, err
+			}
+			for _, rangeItem := range preRange {
+				preResult = append(preResult, rangeItem)
+			}
+		}
+		result := removeDuplicates(preResult)
+		return result, nil
+
+	case strings.Contains(formattedInput, "-"): // если диапазон
+		return parseRange(formattedInput, max)
+
+	case formattedInput == "":
 		if max <= 0 {
 			return []int{}, nil
 		}
@@ -32,31 +109,11 @@ func Parse(input string, max int) ([]int, error) {
 			selected = append(selected, i)
 		}
 		return selected, nil
-	}
-	if strings.Contains(formattedInput, ",") {
-		caseList := strings.Split(formattedInput, ",")
-
-		result := make([]int, 0, len(caseList))
-
-		// map результатов: ключ - элемент
-		unsortedResult := make(map[int]bool)
-
-		for _, item := range caseList {
-			formattedItem, err := parseSingle(strings.TrimSpace(item), max)
-			if err != nil {
-				return nil, err
-			}
-			if !unsortedResult[formattedItem] {
-				unsortedResult[formattedItem] = true
-				result = append(result, formattedItem)
-			}
+	default:
+		result, err := parseSingle(formattedInput, max)
+		if err != nil {
+			return nil, err
 		}
-
-		return result, nil
+		return []int{result}, nil
 	}
-	result, err := parseSingle(formattedInput, max)
-	if err != nil {
-		return nil, err
-	}
-	return []int{result}, nil
 }
